@@ -42,7 +42,7 @@ function endTest() {
     isRunning = false;
     clearInterval(timerId);
     clickArea.style.pointerEvents = 'none';
-    clickArea.querySelector('span').textContent = 'Time's Up!';
+    clickArea.querySelector('span').textContent = "Time's Up!";
     
     const cps = (clicks / testDuration).toFixed(1);
     showResult(cps, clicks);
