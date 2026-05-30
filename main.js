@@ -22,6 +22,7 @@ let score = 0;
 let highScore = localStorage.getItem('snake-high-score') || 0;
 let gameSpeed = 100;
 let isGameOver = false;
+let gameStarted = false;
 let gameLoopId = null;
 
 highScoreElement.textContent = highScore;
@@ -51,7 +52,10 @@ function createFood() {
 }
 
 function drawGame() {
-    if (isGameOver) return;
+    if (isGameOver) {
+        gameStarted = false;
+        return;
+    }
 
     moveSnake();
     checkCollision();
@@ -146,9 +150,10 @@ function checkCollision() {
 
 function gameOver() {
     isGameOver = true;
+    gameStarted = false;
     clearTimeout(gameLoopId);
     overlayTitle.textContent = 'Game Over!';
-    overlayMsg.textContent = `Final Score: ${score}`;
+    overlayMsg.textContent = `Final Score: ${score}. Press Enter to restart.`;
     startBtn.textContent = 'Play Again';
     overlay.style.display = 'flex';
 }
@@ -160,6 +165,14 @@ function changeDirection(newDx, newDy) {
     nextDy = newDy;
 }
 
+function startGame() {
+    if (gameStarted) return;
+    overlay.style.display = 'none';
+    gameStarted = true;
+    initGame();
+    drawGame();
+}
+
 // Input Handling
 window.addEventListener('keydown', e => {
     switch (e.key) {
@@ -167,6 +180,7 @@ window.addEventListener('keydown', e => {
         case 'ArrowDown': case 's': case 'S': changeDirection(0, 1); break;
         case 'ArrowLeft': case 'a': case 'A': changeDirection(-1, 0); break;
         case 'ArrowRight': case 'd': case 'D': changeDirection(1, 0); break;
+        case 'Enter': startGame(); break;
     }
 });
 
@@ -176,8 +190,4 @@ document.getElementById('down-btn').addEventListener('click', () => changeDirect
 document.getElementById('left-btn').addEventListener('click', () => changeDirection(-1, 0));
 document.getElementById('right-btn').addEventListener('click', () => changeDirection(1, 0));
 
-startBtn.addEventListener('click', () => {
-    overlay.style.display = 'none';
-    initGame();
-    drawGame();
-});
+startBtn.addEventListener('click', startGame);
