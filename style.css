@@ -1,1 +1,106 @@
-/* Add styles here */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
+                      linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
+                      linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
+    background-size: 20px 20px;
+}
+
+.container {
+    text-align: center;
+    padding: 40px;
+    background-color: #1e1e1e;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    max-width: 90%;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #4dff94;
+}
+
+.numbers-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+lotto-number {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    border-radius: 50%;
+    background-color: #333;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+lotto-number:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(77, 255, 148, 0.3);
+}
+
+#generate-btn {
+    background-color: #4dff94;
+    color: #121212;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(77, 255, 148, 0.2);
+}
+
+#generate-btn:hover {
+    background-color: #66ffab;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(77, 255, 148, 0.4);
+}
+
+#generate-btn:active {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .numbers-container {
+        gap: 10px;
+    }
+
+    lotto-number {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    #generate-btn {
+        padding: 12px 25px;
+        font-size: 1rem;
+    }
+}
