@@ -1,114 +1,80 @@
-class LottoNumber extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-    }
+let userScore = 0;
+let compScore = 0;
 
-    connectedCallback() {
-        this.render();
-    }
+const userScoreSpan = document.getElementById('user-score');
+const compScoreSpan = document.getElementById('comp-score');
+const resultDiv = document.getElementById('result');
+const userChoiceDisplay = document.getElementById('user-choice-display');
+const compChoiceDisplay = document.getElementById('comp-choice-display');
+const resetBtn = document.getElementById('reset-btn');
 
-    static get observedAttributes() {
-        return ['number'];
-    }
+const choices = ['rock', 'paper', 'scissors'];
+const icons = {
+    rock: '✊',
+    paper: '✋',
+    scissors: '✌️'
+};
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'number') {
-            this.render();
-        }
-    }
+function getComputerChoice() {
+    const randomIndex = Math.floor(Math.random() * 3);
+    return choices[randomIndex];
+}
 
-    render() {
-        const number = this.getAttribute('number') || '';
-        const colorClass = this.getColorClass(parseInt(number, 10));
+function win(user, comp) {
+    userScore++;
+    userScoreSpan.textContent = userScore;
+    resultDiv.textContent = 'You Win! 🎉';
+    resultDiv.style.color = 'var(--win-color)';
+}
 
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 60px;
-                    height: 60px;
-                    border-radius: 50%;
-                    font-size: 1.8rem;
-                    font-weight: bold;
-                    color: #fff;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
-                }
-                .ball {
-                    width: 100%;
-                    height: 100%;
-                    border-radius: 50%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-                }
-                .color-1 { background-color: #fbc400; }
-                .color-2 { background-color: #69c8f2; }
-                .color-3 { background-color: #ff7272; }
-                .color-4 { background-color: #aaa; }
-                .color-5 { background-color: #b0d840; }
-                
-                @media (max-width: 600px) {
-                    :host {
-                        width: 50px;
-                        height: 50px;
-                        font-size: 1.5rem;
-                    }
-                }
-            </style>
-            <div class="ball ${colorClass}">${number}</div>
-        `;
-    }
+function lose(user, comp) {
+    compScore++;
+    compScoreSpan.textContent = compScore;
+    resultDiv.textContent = 'You Lose! 😢';
+    resultDiv.style.color = 'var(--loss-color)';
+}
 
-    getColorClass(number) {
-        if (number <= 10) return 'color-1';
-        if (number <= 20) return 'color-2';
-        if (number <= 30) return 'color-3';
-        if (number <= 40) return 'color-4';
-        return 'color-5';
+function draw(user, comp) {
+    resultDiv.textContent = "It's a Draw! 🤝";
+    resultDiv.style.color = 'var(--draw-color)';
+}
+
+function game(userChoice) {
+    const compChoice = getComputerChoice();
+    
+    userChoiceDisplay.textContent = icons[userChoice];
+    compChoiceDisplay.textContent = icons[compChoice];
+
+    switch (userChoice + compChoice) {
+        case 'rockscissors':
+        case 'paperrock':
+        case 'scissorspaper':
+            win(userChoice, compChoice);
+            break;
+        case 'rockpaper':
+        case 'scissorsrock':
+        case 'paperscissors':
+            lose(userChoice, compChoice);
+            break;
+        case 'rockrock':
+        case 'paperpaper':
+        case 'scissorsscissors':
+            draw(userChoice, compChoice);
+            break;
     }
 }
 
-customElements.define('lotto-number', LottoNumber);
+document.getElementById('rock').addEventListener('click', () => game('rock'));
+document.getElementById('paper').addEventListener('click', () => game('paper'));
+document.getElementById('scissors').addEventListener('click', () => game('scissors'));
 
-// Lotto Generation Logic
-document.getElementById('generate-btn').addEventListener('click', () => {
-    const numbersContainer = document.getElementById('numbers');
-    numbersContainer.innerHTML = '';
-    const numbers = new Set();
-    while (numbers.size < 6) {
-        numbers.add(Math.floor(Math.random() * 45) + 1);
-    }
-
-    Array.from(numbers).sort((a, b) => a - b).forEach(number => {
-        const lottoNumber = document.createElement('lotto-number');
-        lottoNumber.setAttribute('number', number);
-        numbersContainer.appendChild(lottoNumber);
-    });
-});
-
-// Theme Toggle Logic
-const themeBtn = document.getElementById('theme-btn');
-const currentTheme = localStorage.getItem('theme') || 'dark';
-
-if (currentTheme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-    themeBtn.textContent = 'Dark Mode';
-}
-
-themeBtn.addEventListener('click', () => {
-    let theme = document.documentElement.getAttribute('data-theme');
-    if (theme === 'light') {
-        document.documentElement.removeAttribute('data-theme');
-        themeBtn.textContent = 'Light Mode';
-        localStorage.setItem('theme', 'dark');
-    } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        themeBtn.textContent = 'Dark Mode';
-        localStorage.setItem('theme', 'light');
-    }
+resetBtn.addEventListener('click', () => {
+    userScore = 0;
+    compScore = 0;
+    userScoreSpan.textContent = userScore;
+    compScoreSpan.textContent = compScore;
+    resultDiv.textContent = 'Pick your move!';
+    resultDiv.style.color = 'var(--text-color)';
+    userChoiceDisplay.textContent = '-';
+    compChoiceDisplay.textContent = '-';
 });

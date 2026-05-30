@@ -3,17 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotto Number Recommender</title>
+    <title>Rock Paper Scissors</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <div class="theme-toggle">
-            <button id="theme-btn">Light Mode</button>
+        <h1>Rock Paper Scissors</h1>
+        
+        <div class="score-board">
+            <div class="score">
+                <span id="user-score">0</span>
+                <p>You</p>
+            </div>
+            <div class="score">
+                <span id="comp-score">0</span>
+                <p>Computer</p>
+            </div>
         </div>
-        <h1>Lotto Number Recommender</h1>
-        <div id="numbers" class="numbers-container"></div>
-        <button id="generate-btn">Generate Numbers</button>
+
+        <div class="game-area">
+            <div class="choices">
+                <button class="choice" id="rock">✊</button>
+                <button class="choice" id="paper">✋</button>
+                <button class="choice" id="scissors">✌️</button>
+            </div>
+            
+            <div class="display-area">
+                <div class="result-text" id="result">Pick your move!</div>
+                <div class="choices-display">
+                    <div class="player-move">
+                        <p>You</p>
+                        <div id="user-choice-display" class="move-icon">-</div>
+                    </div>
+                    <div class="player-move">
+                        <p>Computer</p>
+                        <div id="comp-choice-display" class="move-icon">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button id="reset-btn">Reset Game</button>
     </div>
     <script src="main.js"></script>
 </body>
