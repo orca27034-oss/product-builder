@@ -1,80 +1,114 @@
-let userScore = 0;
-let compScore = 0;
+let clicks = 0;
+let timeLeft = 5.00;
+let testDuration = 5;
+let isRunning = false;
+let timerId = null;
 
-const userScoreSpan = document.getElementById('user-score');
-const compScoreSpan = document.getElementById('comp-score');
-const resultDiv = document.getElementById('result');
-const userChoiceDisplay = document.getElementById('user-choice-display');
-const compChoiceDisplay = document.getElementById('comp-choice-display');
+const clickArea = document.getElementById('click-area');
+const timerDisplay = document.getElementById('timer');
+const clickCountDisplay = document.getElementById('click-count');
+const cpsDisplay = document.getElementById('cps-display');
 const resetBtn = document.getElementById('reset-btn');
+const timeBtns = document.querySelectorAll('.time-btn');
 
-const choices = ['rock', 'paper', 'scissors'];
-const icons = {
-    rock: '✊',
-    paper: '✋',
-    scissors: '✌️'
-};
+// Modal elements
+const modal = document.getElementById('result-modal');
+const finalCps = document.getElementById('final-cps');
+const finalClicks = document.getElementById('final-clicks');
+const rankText = document.getElementById('rank-text');
+const closeModal = document.getElementById('close-modal');
 
-function getComputerChoice() {
-    const randomIndex = Math.floor(Math.random() * 3);
-    return choices[randomIndex];
-}
-
-function win(user, comp) {
-    userScore++;
-    userScoreSpan.textContent = userScore;
-    resultDiv.textContent = 'You Win! 🎉';
-    resultDiv.style.color = 'var(--win-color)';
-}
-
-function lose(user, comp) {
-    compScore++;
-    compScoreSpan.textContent = compScore;
-    resultDiv.textContent = 'You Lose! 😢';
-    resultDiv.style.color = 'var(--loss-color)';
-}
-
-function draw(user, comp) {
-    resultDiv.textContent = "It's a Draw! 🤝";
-    resultDiv.style.color = 'var(--draw-color)';
-}
-
-function game(userChoice) {
-    const compChoice = getComputerChoice();
+function startTest() {
+    isRunning = true;
+    clickArea.querySelector('span').textContent = 'Click Fast!';
     
-    userChoiceDisplay.textContent = icons[userChoice];
-    compChoiceDisplay.textContent = icons[compChoice];
+    const startTime = Date.now();
+    const endTime = startTime + (testDuration * 1000);
 
-    switch (userChoice + compChoice) {
-        case 'rockscissors':
-        case 'paperrock':
-        case 'scissorspaper':
-            win(userChoice, compChoice);
-            break;
-        case 'rockpaper':
-        case 'scissorsrock':
-        case 'paperscissors':
-            lose(userChoice, compChoice);
-            break;
-        case 'rockrock':
-        case 'paperpaper':
-        case 'scissorsscissors':
-            draw(userChoice, compChoice);
-            break;
-    }
+    timerId = setInterval(() => {
+        const now = Date.now();
+        const remaining = Math.max(0, (endTime - now) / 1000);
+        
+        timeLeft = remaining;
+        timerDisplay.textContent = timeLeft.toFixed(2);
+
+        if (timeLeft <= 0) {
+            endTest();
+        }
+    }, 10);
 }
 
-document.getElementById('rock').addEventListener('click', () => game('rock'));
-document.getElementById('paper').addEventListener('click', () => game('paper'));
-document.getElementById('scissors').addEventListener('click', () => game('scissors'));
+function endTest() {
+    isRunning = false;
+    clearInterval(timerId);
+    clickArea.style.pointerEvents = 'none';
+    clickArea.querySelector('span').textContent = 'Time's Up!';
+    
+    const cps = (clicks / testDuration).toFixed(1);
+    showResult(cps, clicks);
+}
 
-resetBtn.addEventListener('click', () => {
-    userScore = 0;
-    compScore = 0;
-    userScoreSpan.textContent = userScore;
-    compScoreSpan.textContent = compScore;
-    resultDiv.textContent = 'Pick your move!';
-    resultDiv.style.color = 'var(--text-color)';
-    userChoiceDisplay.textContent = '-';
-    compChoiceDisplay.textContent = '-';
+function showResult(cps, totalClicks) {
+    finalCps.textContent = cps;
+    finalClicks.textContent = totalClicks;
+    
+    let rank = '';
+    if (cps >= 12) rank = 'Godlike! 🚀';
+    else if (cps >= 10) rank = 'Pro Clicker! 🔥';
+    else if (cps >= 7) rank = 'Fast! ⚡';
+    else if (cps >= 4) rank = 'Average. 😐';
+    else rank = 'Snail Pace... 🐌';
+    
+    rankText.textContent = rank;
+    modal.style.display = 'flex';
+}
+
+function resetTest() {
+    clearInterval(timerId);
+    isRunning = false;
+    clicks = 0;
+    timeLeft = testDuration;
+    
+    timerDisplay.textContent = timeLeft.toFixed(2);
+    clickCountDisplay.textContent = '0';
+    cpsDisplay.textContent = '0.0';
+    clickArea.querySelector('span').textContent = 'Click Here to Start!';
+    clickArea.style.pointerEvents = 'auto';
+    modal.style.display = 'none';
+}
+
+clickArea.addEventListener('mousedown', (e) => {
+    if (timeLeft <= 0) return;
+    
+    if (!isRunning) {
+        startTest();
+    }
+    
+    clicks++;
+    clickCountDisplay.textContent = clicks;
+    
+    const elapsed = testDuration - timeLeft;
+    if (elapsed > 0) {
+        cpsDisplay.textContent = (clicks / elapsed).toFixed(1);
+    }
+});
+
+timeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (isRunning) return;
+        
+        timeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        testDuration = parseInt(btn.getAttribute('data-time'));
+        resetTest();
+    });
+});
+
+resetBtn.addEventListener('click', resetTest);
+closeModal.addEventListener('click', resetTest);
+
+// Close modal on outside click
+window.addEventListener('click', (e) => {
+    if (e.target === modal) resetTest();
 });

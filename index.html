@@ -3,47 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rock Paper Scissors</title>
+    <title>CPS Tester - How fast can you click?</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Rock Paper Scissors</h1>
+        <h1>CPS Tester</h1>
         
-        <div class="score-board">
-            <div class="score">
-                <span id="user-score">0</span>
-                <p>You</p>
+        <div class="settings">
+            <button class="time-btn active" data-time="5">5s</button>
+            <button class="time-btn" data-time="10">10s</button>
+            <button class="time-btn" data-time="15">15s</button>
+        </div>
+
+        <div class="stats-board">
+            <div class="stat">
+                <span id="timer">5.00</span>
+                <p>Time Left</p>
             </div>
-            <div class="score">
-                <span id="comp-score">0</span>
-                <p>Computer</p>
+            <div class="stat">
+                <span id="click-count">0</span>
+                <p>Total Clicks</p>
+            </div>
+            <div class="stat">
+                <span id="cps-display">0.0</span>
+                <p>CPS</p>
             </div>
         </div>
 
-        <div class="game-area">
-            <div class="choices">
-                <button class="choice" id="rock">✊</button>
-                <button class="choice" id="paper">✋</button>
-                <button class="choice" id="scissors">✌️</button>
-            </div>
-            
-            <div class="display-area">
-                <div class="result-text" id="result">Pick your move!</div>
-                <div class="choices-display">
-                    <div class="player-move">
-                        <p>You</p>
-                        <div id="user-choice-display" class="move-icon">-</div>
+        <div id="click-area" class="click-area">
+            <span>Click Here to Start!</span>
+        </div>
+
+        <button id="reset-btn">Reset</button>
+
+        <div id="result-modal" class="modal">
+            <div class="modal-content">
+                <h2>Test Finished!</h2>
+                <div class="final-score">
+                    <div class="score-item">
+                        <span id="final-cps">0.0</span>
+                        <p>CPS</p>
                     </div>
-                    <div class="player-move">
-                        <p>Computer</p>
-                        <div id="comp-choice-display" class="move-icon">-</div>
+                    <div class="score-item">
+                        <span id="final-clicks">0</span>
+                        <p>Total Clicks</p>
                     </div>
                 </div>
+                <p id="rank-text"></p>
+                <button id="close-modal">Try Again</button>
             </div>
         </div>
-
-        <button id="reset-btn">Reset Game</button>
     </div>
     <script src="main.js"></script>
 </body>
