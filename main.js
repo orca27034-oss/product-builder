@@ -1,193 +1,224 @@
-const canvas = document.getElementById('game-board');
-const ctx = canvas.getContext('2d');
-const scoreElement = document.getElementById('score');
-const highScoreElement = document.getElementById('high-score');
-const startBtn = document.getElementById('start-btn');
-const overlay = document.getElementById('game-overlay');
-const overlayTitle = document.getElementById('overlay-title');
-const overlayMsg = document.getElementById('overlay-msg');
+const boardElement = document.getElementById('game-board');
+const mineCountElement = document.getElementById('mine-count');
+const timerElement = document.getElementById('timer');
+const resetBtn = document.getElementById('reset-btn');
+const diffBtns = document.querySelectorAll('.diff-btn');
 
-// Game constants
-const gridSize = 20;
-const tileCount = canvas.width / gridSize;
+const levels = {
+    beginner: { rows: 9, cols: 9, mines: 10 },
+    intermediate: { rows: 16, cols: 16, mines: 40 },
+    expert: { rows: 16, cols: 30, mines: 99 }
+};
 
-// Game variables
-let snake = [{ x: 10, y: 10 }];
-let food = { x: 5, y: 5 };
-let dx = 0;
-let dy = 0;
-let nextDx = 0;
-let nextDy = 0;
-let score = 0;
-let highScore = localStorage.getItem('snake-high-score') || 0;
-let gameSpeed = 100;
+let currentLevel = 'beginner';
+let grid = [];
+let mines = [];
+let revealedCount = 0;
+let flags = 0;
+let timer = 0;
+let timerInterval = null;
+let firstClick = true;
 let isGameOver = false;
-let gameStarted = false;
-let gameLoopId = null;
-
-highScoreElement.textContent = highScore;
 
 function initGame() {
-    snake = [{ x: 10, y: 10 }];
-    score = 0;
-    dx = 1;
-    dy = 0;
-    nextDx = 1;
-    nextDy = 0;
-    scoreElement.textContent = score;
+    const { rows, cols, mines: totalMines } = levels[currentLevel];
+    boardElement.className = "board " + currentLevel;
+    boardElement.style.gridTemplateColumns = "repeat(" + cols + ", 30px)";
+    if (window.innerWidth <= 500) {
+        boardElement.style.gridTemplateColumns = "repeat(" + cols + ", 25px)";
+    }
+    
+    boardElement.innerHTML = '';
+    grid = [];
+    mines = [];
+    revealedCount = 0;
+    flags = 0;
+    timer = 0;
+    firstClick = true;
     isGameOver = false;
-    gameSpeed = 100;
-    createFood();
+    clearInterval(timerInterval);
+    timerElement.textContent = '000';
+    mineCountElement.textContent = String(totalMines).padStart(3, '0');
+    resetBtn.textContent = '😊';
+
+    for (let r = 0; r < rows; r++) {
+        grid[r] = [];
+        for (let c = 0; c < cols; c++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            
+            cell.addEventListener('click', () => handleLeftClick(r, c));
+            cell.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                handleRightClick(r, c);
+            });
+            
+            boardElement.appendChild(cell);
+            grid[r][c] = {
+                element: cell,
+                isMine: false,
+                isRevealed: false,
+                isFlagged: false,
+                neighborMines: 0
+            };
+        }
+    }
 }
 
-function createFood() {
-    food = {
-        x: Math.floor(Math.random() * tileCount),
-        y: Math.floor(Math.random() * tileCount)
-    };
-    // Make sure food doesn't appear on snake body
-    snake.forEach(part => {
-        if (part.x === food.x && part.y === food.y) createFood();
-    });
+function plantMines(firstRow, firstCol) {
+    const { rows, cols, mines: totalMines } = levels[currentLevel];
+    let placed = 0;
+    while (placed < totalMines) {
+        const r = Math.floor(Math.random() * rows);
+        const c = Math.floor(Math.random() * cols);
+        
+        // Don't place mine on first click or already placed mine
+        if ((r === firstRow && c === firstCol) || grid[r][c].isMine) continue;
+        
+        // Don't place mine in immediate neighbors of first click for better start
+        if (Math.abs(r - firstRow) <= 1 && Math.abs(c - firstCol) <= 1) continue;
+
+        grid[r][c].isMine = true;
+        mines.push({ r, c });
+        placed++;
+    }
+
+    // Calculate neighbors
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (grid[r][c].isMine) continue;
+            let count = 0;
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    const nr = r + dr;
+                    const nc = c + dc;
+                    if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc].isMine) {
+                        count++;
+                    }
+                }
+            }
+            grid[r][c].neighborMines = count;
+        }
+    }
 }
 
-function drawGame() {
-    if (isGameOver) {
-        gameStarted = false;
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timer++;
+        timerElement.textContent = String(Math.min(timer, 999)).padStart(3, '0');
+    }, 1000);
+}
+
+function handleLeftClick(r, c) {
+    if (isGameOver || grid[r][c].isRevealed || grid[r][c].isFlagged) return;
+
+    if (firstClick) {
+        firstClick = false;
+        plantMines(r, c);
+        startTimer();
+    }
+
+    const cell = grid[r][c];
+    if (cell.isMine) {
+        gameOver(false);
         return;
     }
 
-    moveSnake();
-    checkCollision();
-    
-    // Clear canvas
-    ctx.fillStyle = '#2d2d2d';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    reveal(r, c);
+    checkWin();
+}
 
-    // Draw grid lines
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 0.5;
-    for(let i=0; i<tileCount; i++) {
-        ctx.beginPath(); ctx.moveTo(i*gridSize, 0); ctx.lineTo(i*gridSize, canvas.height); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, i*gridSize); ctx.lineTo(canvas.width, i*gridSize); ctx.stroke();
-    }
+function reveal(r, c) {
+    const { rows, cols } = levels[currentLevel];
+    const cell = grid[r][c];
+    if (cell.isRevealed || cell.isFlagged) return;
 
-    // Draw food
-    ctx.fillStyle = '#f44336';
-    ctx.beginPath();
-    ctx.arc(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/2, gridSize/2 - 2, 0, Math.PI * 2);
-    ctx.fill();
+    cell.isRevealed = true;
+    cell.element.classList.add('revealed');
+    revealedCount++;
 
-    // Draw snake
-    snake.forEach((part, index) => {
-        ctx.fillStyle = (index === 0) ? '#4CAF50' : '#81C784';
-        ctx.strokeStyle = '#2d2d2d';
-        ctx.lineWidth = 2;
-        ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize, gridSize);
-        ctx.strokeRect(part.x * gridSize, part.y * gridSize, gridSize, gridSize);
-        
-        // Add eyes to head
-        if (index === 0) {
-            ctx.fillStyle = 'white';
-            const eyeSize = 3;
-            if (dx === 1) { // Right
-                ctx.fillRect(part.x * gridSize + 12, part.y * gridSize + 4, eyeSize, eyeSize);
-                ctx.fillRect(part.x * gridSize + 12, part.y * gridSize + 12, eyeSize, eyeSize);
-            } else if (dx === -1) { // Left
-                ctx.fillRect(part.x * gridSize + 4, part.y * gridSize + 4, eyeSize, eyeSize);
-                ctx.fillRect(part.x * gridSize + 4, part.y * gridSize + 12, eyeSize, eyeSize);
-            } else if (dy === 1) { // Down
-                ctx.fillRect(part.x * gridSize + 4, part.y * gridSize + 12, eyeSize, eyeSize);
-                ctx.fillRect(part.x * gridSize + 12, part.y * gridSize + 12, eyeSize, eyeSize);
-            } else if (dy === -1) { // Up
-                ctx.fillRect(part.x * gridSize + 4, part.y * gridSize + 4, eyeSize, eyeSize);
-                ctx.fillRect(part.x * gridSize + 12, part.y * gridSize + 4, eyeSize, eyeSize);
+    if (cell.neighborMines > 0) {
+        cell.element.textContent = cell.neighborMines;
+        cell.element.classList.add('n' + cell.neighborMines);
+    } else {
+        // Auto-reveal neighbors for 0-mine cells
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                const nr = r + dr;
+                const nc = c + dc;
+                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                    reveal(nr, nc);
+                }
             }
         }
-    });
-
-    gameLoopId = setTimeout(drawGame, gameSpeed);
+    }
 }
 
-function moveSnake() {
-    dx = nextDx;
-    dy = nextDy;
-    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
-    
-    snake.unshift(head);
-    
-    if (head.x === food.x && head.y === food.y) {
-        score += 10;
-        scoreElement.textContent = score;
-        if (score > highScore) {
-            highScore = score;
-            highScoreElement.textContent = highScore;
-            localStorage.setItem('snake-high-score', highScore);
-        }
-        createFood();
-        // Increase speed slightly
-        if (gameSpeed > 50) gameSpeed -= 1;
+function handleRightClick(r, c) {
+    if (isGameOver || grid[r][c].isRevealed) return;
+
+    const cell = grid[r][c];
+    const { mines: totalMines } = levels[currentLevel];
+
+    if (cell.isFlagged) {
+        cell.isFlagged = false;
+        cell.element.classList.remove('flagged');
+        cell.element.textContent = '';
+        flags--;
     } else {
-        snake.pop();
+        cell.isFlagged = true;
+        cell.element.classList.add('flagged');
+        cell.element.textContent = '🚩';
+        flags++;
+    }
+
+    mineCountElement.textContent = String(Math.max(0, totalMines - flags)).padStart(3, '0');
+}
+
+function checkWin() {
+    const { rows, cols, mines: totalMines } = levels[currentLevel];
+    if (revealedCount === (rows * cols) - totalMines) {
+        gameOver(true);
     }
 }
 
-function checkCollision() {
-    const head = snake[0];
-    
-    // Wall collision
-    if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
-        gameOver();
-    }
-    
-    // Self collision
-    for (let i = 1; i < snake.length; i++) {
-        if (head.x === snake[i].x && head.y === snake[i].y) {
-            gameOver();
-        }
-    }
-}
-
-function gameOver() {
+function gameOver(isWin) {
     isGameOver = true;
-    gameStarted = false;
-    clearTimeout(gameLoopId);
-    overlayTitle.textContent = 'Game Over!';
-    overlayMsg.textContent = `Final Score: ${score}. Press Enter to restart.`;
-    startBtn.textContent = 'Play Again';
-    overlay.style.display = 'flex';
+    clearInterval(timerInterval);
+    resetBtn.textContent = isWin ? '😎' : '😵';
+
+    if (!isWin) {
+        mines.forEach(({ r, c }) => {
+            const cell = grid[r][c];
+            cell.element.classList.add('revealed', 'mine');
+            cell.element.textContent = '💣';
+        });
+    } else {
+        mineCountElement.textContent = '000';
+    }
 }
 
-function changeDirection(newDx, newDy) {
-    // Prevent 180 degree turns
-    if (newDx === -dx || newDy === -dy) return;
-    nextDx = newDx;
-    nextDy = newDy;
-}
+// Event Listeners
+resetBtn.addEventListener('click', initGame);
 
-function startGame() {
-    if (gameStarted) return;
-    overlay.style.display = 'none';
-    gameStarted = true;
-    initGame();
-    drawGame();
-}
+diffBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        diffBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentLevel = btn.dataset.level;
+        initGame();
+    });
+});
 
-// Input Handling
-window.addEventListener('keydown', e => {
-    switch (e.key) {
-        case 'ArrowUp': case 'w': case 'W': changeDirection(0, -1); break;
-        case 'ArrowDown': case 's': case 'S': changeDirection(0, 1); break;
-        case 'ArrowLeft': case 'a': case 'A': changeDirection(-1, 0); break;
-        case 'ArrowRight': case 'd': case 'D': changeDirection(1, 0); break;
-        case 'Enter': startGame(); break;
+window.addEventListener('resize', () => {
+    const { cols } = levels[currentLevel];
+    if (window.innerWidth <= 500) {
+        boardElement.style.gridTemplateColumns = "repeat(" + cols + ", 25px)";
+    } else {
+        boardElement.style.gridTemplateColumns = "repeat(" + cols + ", 30px)";
     }
 });
 
-// Mobile Controls
-document.getElementById('up-btn').addEventListener('click', () => changeDirection(0, -1));
-document.getElementById('down-btn').addEventListener('click', () => changeDirection(0, 1));
-document.getElementById('left-btn').addEventListener('click', () => changeDirection(-1, 0));
-document.getElementById('right-btn').addEventListener('click', () => changeDirection(1, 0));
-
-startBtn.addEventListener('click', startGame);
+initGame();
