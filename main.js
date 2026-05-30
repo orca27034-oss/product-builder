@@ -22,7 +22,7 @@ class LottoNumber extends HTMLElement {
         const number = this.getAttribute('number') || '';
         const colorClass = this.getColorClass(parseInt(number, 10));
 
-        this.shadowRoot.innerHTML = \`
+        this.shadowRoot.innerHTML = `
             <style>
                 :host {
                     display: flex;
@@ -60,8 +60,8 @@ class LottoNumber extends HTMLElement {
                     }
                 }
             </style>
-            <div class="ball \${colorClass}">\${number}</div>
-        \`;
+            <div class="ball ${colorClass}">${number}</div>
+        `;
     }
 
     getColorClass(number) {
