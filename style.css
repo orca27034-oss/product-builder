@@ -1,192 +1,176 @@
 :root {
-    --bg-color: #0f172a;
-    --container-bg: #1e293b;
-    --text-color: #f8fafc;
-    --accent-color: #22d3ee;
-    --accent-hover: #0891b2;
-    --secondary-color: #6366f1;
-    --modal-bg: rgba(0, 0, 0, 0.85);
-    --shadow-color: rgba(0, 0, 0, 0.4);
+    --bg-color: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --text-color: #ffffff;
+    --snake-head: #4CAF50;
+    --snake-body: #81C784;
+    --food-color: #f44336;
+    --accent-color: #4CAF50;
+    --grid-color: #333333;
+    --overlay-bg: rgba(0, 0, 0, 0.8);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    margin: 0;
 }
 
 .container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
     text-align: center;
-    padding: 30px;
-    background-color: var(--container-bg);
-    border-radius: 24px;
-    box-shadow: 0 20px 50px var(--shadow-color);
-    width: 90%;
-    max-width: 500px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 h1 {
-    font-size: 2.5rem;
-    margin-bottom: 25px;
+    font-size: 1.5rem;
     color: var(--accent-color);
-    font-weight: 800;
 }
 
-.settings {
+.score-container {
     display: flex;
-    justify-content: center;
     gap: 15px;
-    margin-bottom: 30px;
 }
 
-.time-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
-    padding: 8px 20px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
+.score-box {
+    background-color: var(--card-bg);
+    padding: 5px 15px;
+    border-radius: 8px;
+    min-width: 70px;
 }
 
-.time-btn.active {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: var(--bg-color);
-    font-weight: bold;
-}
-
-.stats-board {
-    display: flex;
-    justify-content: space-between;
-    background: rgba(15, 23, 42, 0.5);
-    padding: 20px;
-    border-radius: 16px;
-    margin-bottom: 30px;
-}
-
-.stat {
-    flex: 1;
-}
-
-.stat span {
-    font-size: 1.8rem;
-    font-weight: 700;
-    display: block;
-}
-
-.stat p {
-    margin: 5px 0 0;
-    font-size: 0.8rem;
-    color: #94a3b8;
+.score-box p {
+    font-size: 0.7rem;
+    color: #aaa;
     text-transform: uppercase;
 }
 
-.click-area {
-    width: 100%;
-    height: 250px;
-    background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
-    border-radius: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    transition: transform 0.05s ease, box-shadow 0.2s;
-    margin-bottom: 30px;
-    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.2);
+.score-box span {
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
-.click-area:active {
-    transform: scale(0.97);
+#game-board-container {
+    position: relative;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 4px solid #333;
 }
 
-.click-area span {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--bg-color);
-    pointer-events: none;
+canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    image-rendering: pixelated;
 }
 
-#reset-btn {
-    background: transparent;
-    border: 1px solid #475569;
-    color: #94a3b8;
-    padding: 10px 25px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-#reset-btn:hover {
-    border-color: #f87171;
-    color: #f87171;
-}
-
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
+.overlay {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--modal-bg);
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-}
-
-.modal-content {
-    background: var(--container-bg);
-    padding: 40px;
-    border-radius: 24px;
-    text-align: center;
-    width: 80%;
-    max-width: 350px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-}
-
-.final-score {
+    background-color: var(--overlay-bg);
     display: flex;
     justify-content: center;
-    gap: 30px;
-    margin: 25px 0;
+    align-items: center;
+    z-index: 10;
 }
 
-.score-item span {
+.overlay-content h2 {
     font-size: 2.5rem;
-    font-weight: 800;
+    margin-bottom: 10px;
     color: var(--accent-color);
-    display: block;
 }
 
-#rank-text {
-    font-size: 1.1rem;
-    color: #cbd5e1;
-    margin-bottom: 30px;
+.overlay-content p {
+    margin-bottom: 20px;
+    color: #ccc;
 }
 
-#close-modal {
-    background: var(--accent-color);
-    color: var(--bg-color);
+#start-btn {
+    background-color: var(--accent-color);
+    color: white;
     border: none;
     padding: 12px 30px;
-    font-size: 1rem;
-    font-weight: 700;
-    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 30px;
     cursor: pointer;
-    width: 100%;
+    transition: transform 0.2s, background-color 0.2s;
 }
 
-@media (max-width: 450px) {
-    .container { padding: 20px; }
-    h1 { font-size: 2rem; }
-    .stat span { font-size: 1.4rem; }
-    .click-area { height: 200px; }
+#start-btn:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+.controls-guide {
+    margin-top: 20px;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Mobile Controls */
+.mobile-controls {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.ctrl-btn {
+    width: 60px;
+    height: 60px;
+    background-color: var(--card-bg);
+    border: 2px solid #444;
+    color: white;
+    font-size: 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ctrl-btn:active {
+    background-color: #444;
+    transform: scale(0.95);
+}
+
+.side-ctrls {
+    display: flex;
+    gap: 10px;
+}
+
+@media (max-width: 600px) {
+    .mobile-controls {
+        display: flex;
+    }
+    .controls-guide {
+        display: none;
+    }
 }

@@ -3,55 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPS Tester - How fast can you click?</title>
+    <title>Snake Game - Classic Fun</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>CPS Tester</h1>
-        
-        <div class="settings">
-            <button class="time-btn active" data-time="5">5s</button>
-            <button class="time-btn" data-time="10">10s</button>
-            <button class="time-btn" data-time="15">15s</button>
-        </div>
-
-        <div class="stats-board">
-            <div class="stat">
-                <span id="timer">5.00</span>
-                <p>Time Left</p>
-            </div>
-            <div class="stat">
-                <span id="click-count">0</span>
-                <p>Total Clicks</p>
-            </div>
-            <div class="stat">
-                <span id="cps-display">0.0</span>
-                <p>CPS</p>
-            </div>
-        </div>
-
-        <div id="click-area" class="click-area">
-            <span>Click Here to Start!</span>
-        </div>
-
-        <button id="reset-btn">Reset</button>
-
-        <div id="result-modal" class="modal">
-            <div class="modal-content">
-                <h2>Test Finished!</h2>
-                <div class="final-score">
-                    <div class="score-item">
-                        <span id="final-cps">0.0</span>
-                        <p>CPS</p>
-                    </div>
-                    <div class="score-item">
-                        <span id="final-clicks">0</span>
-                        <p>Total Clicks</p>
-                    </div>
+        <div class="header">
+            <h1>Snake Game</h1>
+            <div class="score-container">
+                <div class="score-box">
+                    <p>Score</p>
+                    <span id="score">0</span>
                 </div>
-                <p id="rank-text"></p>
-                <button id="close-modal">Try Again</button>
+                <div class="score-box">
+                    <p>Best</p>
+                    <span id="high-score">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-board-container">
+            <canvas id="game-board" width="400" height="400"></canvas>
+            <div id="game-overlay" class="overlay">
+                <div class="overlay-content">
+                    <h2 id="overlay-title">Ready?</h2>
+                    <p id="overlay-msg">Press Start to Play!</p>
+                    <button id="start-btn">Start Game</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-guide">
+            <p>Use <b>Arrow Keys</b> or <b>WASD</b> to move</p>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div class="mobile-controls">
+            <button id="up-btn" class="ctrl-btn">↑</button>
+            <div class="side-ctrls">
+                <button id="left-btn" class="ctrl-btn">←</button>
+                <button id="down-btn" class="ctrl-btn">↓</button>
+                <button id="right-btn" class="ctrl-btn">→</button>
             </div>
         </div>
     </div>
