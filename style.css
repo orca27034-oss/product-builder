@@ -1,32 +1,78 @@
+:root {
+    --bg-color: #121212;
+    --container-bg: #1e1e1e;
+    --text-color: #ffffff;
+    --accent-color: #4dff94;
+    --accent-hover: #66ffab;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --grid-color: #1a1a1a;
+}
+
+[data-theme="light"] {
+    --bg-color: #f0f2f5;
+    --container-bg: #ffffff;
+    --text-color: #121212;
+    --accent-color: #007bff;
+    --accent-hover: #0056b3;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --grid-color: #e5e7eb;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: #121212;
-    color: #ffffff;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    background-image: linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
-                      linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
-                      linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
-                      linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
+    background-image: linear-gradient(45deg, var(--grid-color) 25%, transparent 25%),
+                      linear-gradient(-45deg, var(--grid-color) 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, var(--grid-color) 75%),
+                      linear-gradient(-45deg, transparent 75%, var(--grid-color) 75%);
     background-size: 20px 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
     text-align: center;
     padding: 40px;
-    background-color: #1e1e1e;
+    background-color: var(--container-bg);
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px var(--shadow-color);
     max-width: 90%;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+#theme-btn {
+    background: none;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+#theme-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--container-bg);
 }
 
 h1 {
     font-size: 2.5rem;
     margin-bottom: 30px;
-    color: #4dff94;
+    color: var(--accent-color);
+    transition: color 0.3s ease;
 }
 
 .numbers-container {
@@ -58,8 +104,8 @@ lotto-number:hover {
 }
 
 #generate-btn {
-    background-color: #4dff94;
-    color: #121212;
+    background-color: var(--accent-color);
+    color: var(--container-bg);
     border: none;
     padding: 15px 30px;
     font-size: 1.2rem;
@@ -67,13 +113,13 @@ lotto-number:hover {
     border-radius: 50px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 5px 15px rgba(77, 255, 148, 0.2);
+    box-shadow: 0 5px 15px var(--shadow-color);
 }
 
 #generate-btn:hover {
-    background-color: #66ffab;
+    background-color: var(--accent-hover);
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(77, 255, 148, 0.4);
+    box-shadow: 0 8px 25px var(--shadow-color);
 }
 
 #generate-btn:active {

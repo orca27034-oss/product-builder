@@ -22,7 +22,7 @@ class LottoNumber extends HTMLElement {
         const number = this.getAttribute('number') || '';
         const colorClass = this.getColorClass(parseInt(number, 10));
 
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML = \`
             <style>
                 :host {
                     display: flex;
@@ -44,15 +44,24 @@ class LottoNumber extends HTMLElement {
                     display: flex;
                     justify-content: center;
                     align-items: center;
+                    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
                 }
                 .color-1 { background-color: #fbc400; }
                 .color-2 { background-color: #69c8f2; }
                 .color-3 { background-color: #ff7272; }
                 .color-4 { background-color: #aaa; }
                 .color-5 { background-color: #b0d840; }
+                
+                @media (max-width: 600px) {
+                    :host {
+                        width: 50px;
+                        height: 50px;
+                        font-size: 1.5rem;
+                    }
+                }
             </style>
-            <div class="ball ${colorClass}">${number}</div>
-        `;
+            <div class="ball \${colorClass}">\${number}</div>
+        \`;
     }
 
     getColorClass(number) {
@@ -66,6 +75,7 @@ class LottoNumber extends HTMLElement {
 
 customElements.define('lotto-number', LottoNumber);
 
+// Lotto Generation Logic
 document.getElementById('generate-btn').addEventListener('click', () => {
     const numbersContainer = document.getElementById('numbers');
     numbersContainer.innerHTML = '';
@@ -79,4 +89,26 @@ document.getElementById('generate-btn').addEventListener('click', () => {
         lottoNumber.setAttribute('number', number);
         numbersContainer.appendChild(lottoNumber);
     });
+});
+
+// Theme Toggle Logic
+const themeBtn = document.getElementById('theme-btn');
+const currentTheme = localStorage.getItem('theme') || 'dark';
+
+if (currentTheme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    themeBtn.textContent = 'Dark Mode';
+}
+
+themeBtn.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'light') {
+        document.documentElement.removeAttribute('data-theme');
+        themeBtn.textContent = 'Light Mode';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeBtn.textContent = 'Dark Mode';
+        localStorage.setItem('theme', 'light');
+    }
 });
