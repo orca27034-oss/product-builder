@@ -21,9 +21,47 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
+    padding-top: 40px;
+}
+
+.game-switcher {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    background: var(--card-bg);
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.switch-btn {
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.switch-btn.active {
+    background: var(--accent-color);
+    color: white;
+}
+
+.game-container {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+}
+
+.game-container.active {
+    display: block;
 }
 
 .container {
@@ -32,6 +70,22 @@ body {
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     text-align: center;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+/* Snake Specific Styles */
+.snake-board-container {
+    background-color: #0f172a;
+    border-radius: 8px;
+    padding: 4px;
+    line-height: 0;
+}
+
+#snake-canvas {
+    border-radius: 4px;
+    max-width: 100%;
+    height: auto;
 }
 
 h1 {
