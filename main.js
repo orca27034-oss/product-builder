@@ -1,398 +1,93 @@
-// Game Switching Logic
-const switchBtns = document.querySelectorAll('.switch-btn');
-const gameContainers = document.querySelectorAll('.game-container');
+const menus = [
+    // Korean (한식)
+    { name: "김치찌개", category: "korean", categoryName: "한식", desc: "얼큰하고 시원한 한국인의 소울푸드!" },
+    { name: "된장찌개", category: "korean", categoryName: "한식", desc: "구수한 된장과 보글보글 두부의 만남." },
+    { name: "제육볶음", category: "korean", categoryName: "한식", desc: "매콤달콤한 양념에 볶아낸 밥도둑 돼지고기." },
+    { name: "비빔밥", category: "korean", categoryName: "한식", desc: "각종 나물과 고추장으로 비벼낸 건강 한 끼." },
+    { name: "불고기", category: "korean", categoryName: "한식", desc: "달콤 짭짤한 양념이 쏙 배어든 소고기 요리." },
+    { name: "삼겹살", category: "korean", categoryName: "한식", desc: "지글지글 구워 먹는 최고의 저녁 외식 메뉴." },
+    { name: "닭볶음탕", category: "korean", categoryName: "한식", desc: "포슬포슬한 감자와 매콤한 닭고기의 조화." },
+    { name: "보쌈", category: "korean", categoryName: "한식", desc: "야들야ly한 수육과 갓 담근 겉절이의 꿀조합." },
+    { name: "냉면", category: "korean", categoryName: "한식", desc: "시원한 육수 혹은 매콤한 양념의 깔끔한 선택." },
+    { name: "순두부찌개", category: "korean", categoryName: "한식", desc: "부드러운 순두부와 얼큰한 국물의 환상 궁합." },
 
-switchBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const game = btn.dataset.game;
+    // Japanese (일식)
+    { name: "초밥", category: "japanese", categoryName: "일식", desc: "신선한 생선과 고슬고슬한 밥의 만남." },
+    { name: "돈카츠", category: "japanese", categoryName: "일식", desc: "바삭바삭한 튀김옷 속 촉촉한 등심/안심." },
+    { name: "라멘", category: "japanese", categoryName: "일식", desc: "진한 국물과 쫄깃한 면발이 일품인 일본식 면요리." },
+    { name: "사케동", category: "japanese", categoryName: "일식", desc: "입안에서 사르르 녹는 연어 덮밥." },
+    { name: "규동", category: "japanese", categoryName: "일식", desc: "짭짤한 소고기가 듬뿍 올라간 소고기 덮밥." },
+    { name: "텐동", category: "japanese", categoryName: "일식", desc: "바삭한 튀김이 한가득 올라간 튀김 덮밥." },
+    { name: "우동", category: "japanese", categoryName: "일식", desc: "통통한 면발과 따끈한 국물의 정석." },
+    { name: "오코노미야끼", category: "japanese", categoryName: "일식", desc: "취향껏 넣은 재료와 달콤 짭짤한 소스의 조화." },
+
+    // Chinese (중식)
+    { name: "짜장면", category: "chinese", categoryName: "중식", desc: "남녀노소 누구나 좋아하는 국민 중화요리." },
+    { name: "짬뽕", category: "chinese", categoryName: "중식", desc: "불맛 가득한 얼큰한 해물 국물 요리." },
+    { name: "탕수육", category: "chinese", categoryName: "중식", desc: "바삭하게 튀겨 달콤한 소스를 곁들인 별미." },
+    { name: "마라탕", category: "chinese", categoryName: "중식", desc: "얼얼하고 매콤한 중독성 강한 맛." },
+    { name: "꿔바로우", category: "chinese", categoryName: "중식", desc: "쫀득바삭한 식감이 일품인 북경식 탕수육." },
+    { name: "마파두부", category: "chinese", categoryName: "중식", desc: "매콤한 소스와 부드러운 두부의 밥도둑 조합." },
+    { name: "볶음밥", category: "chinese", categoryName: "중식", desc: "고슬고슬하게 볶아낸 중식 계란 볶음밥." },
+
+    // Western (양식)
+    { name: "스테이크", category: "western", categoryName: "양식", desc: "특별한 기분을 내고 싶을 때 최고의 선택." },
+    { name: "파스타", category: "western", categoryName: "양식", desc: "토마토, 크림, 오일 등 취향대로 즐기는 면요리." },
+    { name: "피자", category: "western", categoryName: "양식", desc: "치즈가 듬뿍 들어간 든든한 한 끼 식사." },
+    { name: "햄버거", category: "western", categoryName: "양식", desc: "육즙 가득한 패티와 신선한 채소의 만남." },
+    { name: "리조또", category: "western", categoryName: "양식", desc: "부드럽고 고소한 맛의 이탈리아식 쌀 요리." },
+    { name: "라자냐", category: "western", categoryName: "양식", desc: "겹겹이 쌓인 면과 소스, 치즈의 풍부한 맛." },
+    { name: "샐러드", category: "western", categoryName: "양식", desc: "가벼우면서도 신선한 채소 위주의 건강식." },
+
+    // Simple (간편식)
+    { name: "떡볶이", category: "simple", categoryName: "간편식", desc: "매콤달콤한 소스와 쫄깃한 떡의 조화." },
+    { name: "김밥", category: "simple", categoryName: "간편식", desc: "간편하지만 영양 가득한 한국식 롤." },
+    { name: "라면", category: "simple", categoryName: "간편식", desc: "가장 빠르고 확실한 한 끼 만족." },
+    { name: "샌드위치", category: "simple", categoryName: "간편식", desc: "바쁜 일상 속 간편하게 즐기는 든든함." },
+    { name: "만두", category: "simple", categoryName: "간편식", desc: "쪄도, 구워도, 튀겨도 맛있는 만능 간식/식사." },
+    { name: "토스트", category: "simple", categoryName: "간편식", desc: "바삭하게 구운 빵과 다양한 재료의 조화." }
+];
+
+let selectedCategory = "all";
+
+const chips = document.querySelectorAll('.chip');
+const recommendBtn = document.getElementById('recommend-btn');
+const resultSection = document.getElementById('result-section');
+const menuCategory = document.getElementById('menu-category');
+const menuName = document.getElementById('menu-name');
+const menuDesc = document.getElementById('menu-desc');
+
+// Category Selection
+chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedCategory = chip.dataset.category;
+    });
+});
+
+// Recommendation Logic
+recommendBtn.addEventListener('click', () => {
+    // Filter menus based on category
+    const filteredMenus = selectedCategory === "all" 
+        ? menus 
+        : menus.filter(m => m.category === selectedCategory);
+
+    // Pick random
+    const randomIndex = Math.floor(Math.random() * filteredMenus.length);
+    const selectedMenu = filteredMenus[randomIndex];
+
+    // Show result with animation
+    resultSection.classList.add('hidden');
+    
+    setTimeout(() => {
+        menuCategory.textContent = selectedMenu.categoryName;
+        menuName.textContent = selectedMenu.name;
+        menuDesc.textContent = selectedMenu.desc;
         
-        switchBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        gameContainers.forEach(container => {
-            container.classList.remove('active');
-            if (container.id === `${game}-game`) {
-                container.classList.add('active');
-            }
-        });
-
-        if (game === 'snake') {
-            clearInterval(msTimerInterval);
-            initSnakeGame();
-        } else {
-            stopSnakeGame();
-            initMinesweeper();
-        }
-    });
+        resultSection.classList.remove('hidden');
+        resultSection.querySelector('.result-card').classList.remove('animate-pop');
+        void resultSection.offsetWidth; // Trigger reflow
+        resultSection.querySelector('.result-card').classList.add('animate-pop');
+    }, 200);
 });
-
-// --- Minesweeper Logic ---
-const boardElement = document.getElementById('game-board');
-const mineCountElement = document.getElementById('mine-count');
-const timerElement = document.getElementById('timer');
-const resetBtn = document.getElementById('reset-btn');
-const diffBtns = document.querySelectorAll('.diff-btn');
-
-const levels = {
-    beginner: { rows: 9, cols: 9, mines: 10 },
-    intermediate: { rows: 16, cols: 16, mines: 40 },
-    expert: { rows: 16, cols: 30, mines: 99 }
-};
-
-let currentLevel = 'beginner';
-let grid = [];
-let mines = [];
-let revealedCount = 0;
-let flags = 0;
-let msTimer = 0;
-let msTimerInterval = null;
-let firstClick = true;
-let isMSGameOver = false;
-
-function initMinesweeper() {
-    const { rows, cols, mines: totalMines } = levels[currentLevel];
-    boardElement.className = "board " + currentLevel;
-    boardElement.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
-    if (window.innerWidth <= 500) {
-        boardElement.style.gridTemplateColumns = `repeat(${cols}, 25px)`;
-    }
-    
-    boardElement.innerHTML = '';
-    grid = [];
-    mines = [];
-    revealedCount = 0;
-    flags = 0;
-    msTimer = 0;
-    firstClick = true;
-    isMSGameOver = false;
-    clearInterval(msTimerInterval);
-    timerElement.textContent = '000';
-    mineCountElement.textContent = String(totalMines).padStart(3, '0');
-    resetBtn.textContent = '😊';
-
-    for (let r = 0; r < rows; r++) {
-        grid[r] = [];
-        for (let c = 0; c < cols; c++) {
-            const cell = document.createElement('div');
-            cell.classList.add('cell');
-            cell.dataset.row = r;
-            cell.dataset.col = c;
-            
-            cell.addEventListener('click', () => handleLeftClick(r, c));
-            cell.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                handleRightClick(r, c);
-            });
-            
-            boardElement.appendChild(cell);
-            grid[r][c] = {
-                element: cell,
-                isMine: false,
-                isRevealed: false,
-                isFlagged: false,
-                neighborMines: 0
-            };
-        }
-    }
-}
-
-function plantMines(firstRow, firstCol) {
-    const { rows, cols, mines: totalMines } = levels[currentLevel];
-    let placed = 0;
-    while (placed < totalMines) {
-        const r = Math.floor(Math.random() * rows);
-        const c = Math.floor(Math.random() * cols);
-        if ((r === firstRow && c === firstCol) || grid[r][c].isMine) continue;
-        if (Math.abs(r - firstRow) <= 1 && Math.abs(c - firstCol) <= 1) continue;
-        grid[r][c].isMine = true;
-        mines.push({ r, c });
-        placed++;
-    }
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (grid[r][c].isMine) continue;
-            let count = 0;
-            for (let dr = -1; dr <= 1; dr++) {
-                for (let dc = -1; dc <= 1; dc++) {
-                    const nr = r + dr;
-                    const nc = c + dc;
-                    if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc].isMine) count++;
-                }
-            }
-            grid[r][c].neighborMines = count;
-        }
-    }
-}
-
-function startMSTimer() {
-    msTimerInterval = setInterval(() => {
-        msTimer++;
-        timerElement.textContent = String(Math.min(msTimer, 999)).padStart(3, '0');
-    }, 1000);
-}
-
-function handleLeftClick(r, c) {
-    if (isMSGameOver || grid[r][c].isRevealed || grid[r][c].isFlagged) return;
-    if (firstClick) {
-        firstClick = false;
-        plantMines(r, c);
-        startMSTimer();
-    }
-    if (grid[r][c].isMine) {
-        endMSGame(false);
-        return;
-    }
-    reveal(r, c);
-    if (revealedCount === (levels[currentLevel].rows * levels[currentLevel].cols) - levels[currentLevel].mines) {
-        endMSGame(true);
-    }
-}
-
-function reveal(r, c) {
-    const { rows, cols } = levels[currentLevel];
-    const cell = grid[r][c];
-    if (cell.isRevealed || cell.isFlagged) return;
-    cell.isRevealed = true;
-    cell.element.classList.add('revealed');
-    revealedCount++;
-    if (cell.neighborMines > 0) {
-        cell.element.textContent = cell.neighborMines;
-        cell.element.classList.add('n' + cell.neighborMines);
-    } else {
-        for (let dr = -1; dr <= 1; dr++) {
-            for (let dc = -1; dc <= 1; dc++) {
-                const nr = r + dr;
-                const nc = c + dc;
-                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) reveal(nr, nc);
-            }
-        }
-    }
-}
-
-function handleRightClick(r, c) {
-    if (isMSGameOver || grid[r][c].isRevealed) return;
-    const cell = grid[r][c];
-    if (cell.isFlagged) {
-        cell.isFlagged = false;
-        cell.element.classList.remove('flagged');
-        cell.element.textContent = '';
-        flags--;
-    } else {
-        cell.isFlagged = true;
-        cell.element.classList.add('flagged');
-        cell.element.textContent = '🚩';
-        flags++;
-    }
-    mineCountElement.textContent = String(Math.max(0, levels[currentLevel].mines - flags)).padStart(3, '0');
-}
-
-function endMSGame(isWin) {
-    isMSGameOver = true;
-    clearInterval(msTimerInterval);
-    resetBtn.textContent = isWin ? '😎' : '😵';
-    if (!isWin) {
-        mines.forEach(({ r, c }) => {
-            grid[r][c].element.classList.add('revealed', 'mine');
-            grid[r][c].element.textContent = '💣';
-        });
-    } else {
-        mineCountElement.textContent = '000';
-    }
-}
-
-resetBtn.addEventListener('click', initMinesweeper);
-diffBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        diffBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentLevel = btn.dataset.level;
-        initMinesweeper();
-    });
-});
-
-// --- Snake Logic ---
-const canvas = document.getElementById('snake-canvas');
-const ctx = canvas.getContext('2d');
-const snakeScoreElement = document.getElementById('snake-score');
-const snakeHighScoreElement = document.getElementById('snake-high-score');
-const snakeResetBtn = document.getElementById('snake-reset-btn');
-
-const gridSize = 20;
-const tileCount = 20;
-
-let snake = [{ x: 10, y: 10 }];
-let food = { x: 5, y: 5 };
-let dx = 0;
-let dy = 0;
-let nextDx = 0;
-let nextDy = 0;
-let score = 0;
-let highScore = 0;
-try {
-    highScore = localStorage.getItem('snakeHighScore') || 0;
-} catch (e) {
-    highScore = 0;
-}
-let snakeGameInterval = null;
-let snakeSpeed = 100;
-let isSnakeMoving = false;
-let isSnakeGameOver = false;
-
-function initSnakeGame() {
-    stopSnakeGame();
-    snake = [{ x: 10, y: 10 }];
-    generateFood();
-    dx = 0;
-    dy = 0;
-    nextDx = 0;
-    nextDy = 0;
-    score = 0;
-    isSnakeMoving = false;
-    isSnakeGameOver = false;
-    snakeScoreElement.textContent = '000';
-    snakeHighScoreElement.textContent = String(highScore).padStart(3, '0');
-    
-    drawSnakeGame();
-    snakeGameInterval = setInterval(updateSnake, snakeSpeed);
-}
-
-function stopSnakeGame() {
-    clearInterval(snakeGameInterval);
-    snakeGameInterval = null;
-}
-
-function updateSnake() {
-    if (isSnakeGameOver) return;
-
-    dx = nextDx;
-    dy = nextDy;
-    
-    if (dx !== 0 || dy !== 0) {
-        isSnakeMoving = true;
-        const head = { x: snake[0].x + dx, y: snake[0].y + dy };
-
-        // Wall collision
-        if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
-            return endSnakeGame();
-        }
-
-        // Self collision
-        for (let i = 0; i < snake.length; i++) {
-            if (snake[i].x === head.x && snake[i].y === head.y) return endSnakeGame();
-        }
-
-        snake.unshift(head);
-
-        // Food collision
-        if (head.x === food.x && head.y === food.y) {
-            score += 10;
-            snakeScoreElement.textContent = String(score).padStart(3, '0');
-            if (score > highScore) {
-                highScore = score;
-                try {
-                    localStorage.setItem('snakeHighScore', highScore);
-                } catch (e) {}
-                snakeHighScoreElement.textContent = String(highScore).padStart(3, '0');
-            }
-            generateFood();
-        } else {
-            snake.pop();
-        }
-    }
-
-    drawSnakeGame();
-}
-
-function drawSnakeGame() {
-    // Clear canvas
-    ctx.fillStyle = '#0f172a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw food
-    ctx.fillStyle = '#ef4444';
-    ctx.beginPath();
-    ctx.arc((food.x * gridSize) + gridSize/2, (food.y * gridSize) + gridSize/2, gridSize/2 - 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Draw snake
-    snake.forEach((part, index) => {
-        ctx.fillStyle = index === 0 ? '#3b82f6' : '#60a5fa';
-        ctx.fillRect(part.x * gridSize + 1, part.y * gridSize + 1, gridSize - 2, gridSize - 2);
-    });
-
-    if (!isSnakeMoving && !isSnakeGameOver) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        ctx.font = '20px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Press any Arrow Key to Start', canvas.width / 2, canvas.height / 2 + 50);
-    }
-
-    if (isSnakeGameOver) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 30px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 10);
-        ctx.font = '20px Inter, sans-serif';
-        ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 30);
-        ctx.font = '16px Inter, sans-serif';
-        ctx.fillText('Press Reset to Try Again', canvas.width / 2, canvas.height / 2 + 70);
-    }
-}
-
-function generateFood() {
-    food = {
-        x: Math.floor(Math.random() * tileCount),
-        y: Math.floor(Math.random() * tileCount)
-    };
-    for (let i = 0; i < snake.length; i++) {
-        if (snake[i].x === food.x && snake[i].y === food.y) return generateFood();
-    }
-}
-
-function endSnakeGame() {
-    isSnakeGameOver = true;
-    isSnakeMoving = false;
-    drawSnakeGame();
-}
-
-window.addEventListener('keydown', e => {
-    // Only handle keys if snake game is active
-    const snakeGameActive = document.getElementById('snake-game').classList.contains('active');
-    if (!snakeGameActive) return;
-
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd'].includes(e.key)) {
-        e.preventDefault();
-    }
-
-    if (isSnakeGameOver) return;
-
-    switch (e.key) {
-        case 'ArrowUp':
-        case 'w':
-        case 'W':
-            if (dy !== 1) { nextDx = 0; nextDy = -1; }
-            break;
-        case 'ArrowDown':
-        case 's':
-        case 'S':
-            if (dy !== -1) { nextDx = 0; nextDy = 1; }
-            break;
-        case 'ArrowLeft':
-        case 'a':
-        case 'A':
-            if (dx !== 1) { nextDx = -1; nextDy = 0; }
-            break;
-        case 'ArrowRight':
-        case 'd':
-        case 'D':
-            if (dx !== -1) { nextDx = 1; nextDy = 0; }
-            break;
-    }
-});
-
-snakeResetBtn.addEventListener('click', initSnakeGame);
-
-// Initial start
-initMinesweeper();
